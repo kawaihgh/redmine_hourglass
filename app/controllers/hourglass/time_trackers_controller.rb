@@ -13,6 +13,7 @@ module Hourglass
     def start
       time_tracker = authorize Hourglass::TimeTracker.new params[:time_tracker] ? time_tracker_params.except(:start) : {}
       if time_tracker.save
+        update_working_on(User.current, time_tracker.issue) if time_tracker.issue
         respond_with_success time_tracker
       else
         respond_with_error :bad_request, time_tracker.errors.full_messages, array_mode: :sentence
@@ -73,6 +74,19 @@ module Hourglass
 
     def time_tracker_from_id(id = params[:id])
       Hourglass::TimeTracker.find id
+    end
+
+
+    def update_working_on(user, issue)
+      begin
+        ::WorkingOnMailer.deliver_now(user, issue)
+      rescue Exception => ex
+        Rails.logger.error <<-ERROR
+Failed to send notice to WorkingOn for User#id:#{user.id} and Issue#id:#{issue.id}
+#{ex.message}
+#{ex.backtrace.join("\n")}
+ERROR
+      end
     end
   end
 end
