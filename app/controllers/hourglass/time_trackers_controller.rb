@@ -1,3 +1,4 @@
+# coding: utf-8
 module Hourglass
   class TimeTrackersController < ApiBaseController
     accept_api_auth :index, :show, :start, :update, :bulk_update, :stop, :destroy, :bulk_destroy
@@ -80,12 +81,32 @@ module Hourglass
     def update_working_on(user, issue)
       begin
         ::WorkingOnMailer.deliver_now(user, issue)
+        update_issue_status(user, issue)
       rescue Exception => ex
         Rails.logger.error <<-ERROR
 Failed to send notice to WorkingOn for User#id:#{user.id} and Issue#id:#{issue.id}
 #{ex.message}
 #{ex.backtrace.join("\n")}
 ERROR
+      end
+    end
+
+    def update_issue_status(user, issue)
+      new_status_id = case issue.status_id.to_i
+                      when 1
+                        # 新規 → 進行中
+                        2
+                      when 3
+                        # 対応済み → テスト中
+                        7
+                      end
+      return unless new_status_id
+
+      new_status = IssueStatus.find_by_id(new_status_id)
+      if issue.new_statuses_allowed_to(user).include?(new_status)
+        issue.init_journal(user, '作業時間の記録が開始された為、ステータスを移行しました。')
+        issue.status_id = new_status_id
+        issue.save
       end
     end
   end
