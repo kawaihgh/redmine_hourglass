@@ -10,7 +10,7 @@ case $REDMINE_VERSION in
           export MIGRATE_PLUGINS=db:migrate_plugins
           export REDMINE_TARBALL=https://github.com/redmine/redmine/archive/$REDMINE_VERSION.tar.gz
           ;;
-  2.*|3.*)
+  2.*|3.*|4.*)
           export PATH_TO_PLUGINS=./plugins # for redmine >= 2.0
           export GENERATE_SECRET=generate_secret_token
           export MIGRATE_PLUGINS=redmine:plugins:migrate
@@ -36,7 +36,7 @@ if [ -n "${REDMINE_GIT_TAG}" ]; then
     git checkout $REDMINE_GIT_TAG
 else
     mkdir -p $PATH_TO_REDMINE
-    wget $REDMINE_TARBALL -O- | tar -C $PATH_TO_REDMINE -xz --strip=1 --show-transformed -f -
+    wget $REDMINE_TARBALL -qO- | tar -C $PATH_TO_REDMINE -xz --strip=1 --show-transformed -f -
 fi
 
 # prepare plugin for tests
@@ -47,4 +47,16 @@ if [ -L "$PATH_TO_PLUGINS/$PLUGIN" ]; then
 fi
 ln -s "$PATH_TO_PLUGIN" "$PATH_TO_PLUGINS/$PLUGIN"
 
-cp $PATH_TO_PLUGINS/$PLUGIN/.travis/database.yml config/database.yml
+case $DATABASE in
+  MYSQL)    cp $PATH_TO_PLUGINS/$PLUGIN/.travis/mysql_database.yml config/database.yml
+            ;;
+  POSTGRESQL)
+            cp $PATH_TO_PLUGINS/$PLUGIN/.travis/postgresql_database.yml config/database.yml
+            ;;
+  *)        cp $PATH_TO_PLUGINS/$PLUGIN/.travis/sqlite3_database.yml config/database.yml
+            ;;
+esac
+
+if [ "$UPDATE_DEFAULT_GEMS" = "1" ]; then
+    gem update --system
+fi

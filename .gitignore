@@ -7,3 +7,5 @@
 Gemfile.lock
 
 tmp/rubycritic/
+/.bundle
+.ruby-version
