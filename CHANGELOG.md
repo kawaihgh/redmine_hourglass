@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [unreleased] - TBA
+
+### Added
+- [please add new features]
+
+### Changed
+- [please add noteworthy changes]
+
+### Removed
+- [please add dropped features]
+
+### Fixed
+- [please add bug fixes]
+
+## [1.1.2] - 2019-04-18
+
+Bugfix release.
+
+### Fixed
+
+- fixed issue where changes to the project filter in time bookings queries would corrupt activity and user filters
+- enhanced activity display in report by adding a dash
+
+## [1.1.1] - 2019-04-04
+
+Bugfix release.
+
+### Fixed
+- creating & updating saved queries for time logs, time bookings and tracker
+- position of the edit & delete buttons for saved queries for hourglass views
+
 ## [1.1.0] - 2019-03-25
 
 First release with Redmine 4.0 support.
