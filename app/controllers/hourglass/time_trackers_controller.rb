@@ -88,7 +88,7 @@ module Hourglass
         icon_url:   Setting.plugin_redmine_slack['icon'],
       }
 
-      params[:msg] = "[#{escape_for_slack(issue.project)}] #{escape_for_slack(issue.author)} started work on <#{object_url(issue)}|#{escape_for_slack(issue)}>#{mentions_for_slack(issue.description)}"
+      params[:text] = "[#{escape_for_slack(issue.project)}] #{escape_for_slack(issue.author)} started work on <#{object_url(issue)}|#{escape_for_slack(issue)}>#{mentions_for_slack(issue.description)}"
 
       attachment          = {}
       attachment[:text]   = escape_for_slack(issue.description) if issue.description
@@ -101,6 +101,11 @@ module Hourglass
         {
           title: I18n.t("field_priority"),
           value: escape_for_slack(issue.priority.to_s),
+          short: true
+        },
+        {
+          title: I18n.t("field_done_ratio"),
+          value: escape_for_slack(issue.done_ratio.to_s),
           short: true
         },
         {
