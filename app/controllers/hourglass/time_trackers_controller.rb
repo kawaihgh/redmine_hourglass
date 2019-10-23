@@ -78,17 +78,14 @@ module Hourglass
       Hourglass::TimeTracker.find id
     end
 
-    SLACK_URL      = 'https://hooks.slack.com/services/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'.freeze
-    SLACK_CHANNEL  = '#redmine'.freeze
-    SLACK_USERNAME = 'In Control Redmine'.freeze
-    SLACK_ICON_URL = 'https://project.in-control.co.jp/themes/gitmike/images/logo.png'.freeze
+    SLACK_CHANNEL = '#redmine'.freeze
 
     def post_to_slack(user, issue)
       params = {
         link_names: 1,
-        username:   SLACK_USERNAME,
+        username:   Setting.plugin_redmine_slack['username'],
         channel:    SLACK_CHANNEL,
-        icon_url:   SLACK_ICON_URL
+        icon_url:   Setting.plugin_redmine_slack['icon'],
       }
 
       params[:msg] = "[#{escape_for_slack(issue.project)}] #{escape_for_slack(issue.author)} started work on <#{object_url(issue)}|#{escape_for_slack(issue)}>#{mentions_for_slack(issue.description)}"
@@ -123,7 +120,7 @@ module Hourglass
         client = HTTPClient.new
         client.ssl_config.cert_store.set_default_paths
         client.ssl_config.ssl_version = :auto
-        client.post_async(SLACK_URL, payload: params.to_json)
+        client.post_async(Setting.plugin_redmine_slack['slack_url'], payload: params.to_json)
 
         update_issue_status(user, issue)
       rescue
