@@ -64,7 +64,7 @@ showInlineForm = (event, response) ->
   .removeClass 'hascontextmenu context-menu-selection'
   .empty()
   .append $('<td/>', class: 'hide-when-print')
-  .append $('<td/>', colspan: tdCount).append response
+  .append $('<td/>', colspan: tdCount).append $(event.detail[2].responseText)
   .insertAfter $row
   $formRow.find('.js-validate-limit').each addStartStopLimitMoments
   $durationField = $formRow.find('.js-duration')
